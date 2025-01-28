@@ -1,0 +1,44 @@
+.request-page {
+    padding: 120px;
+    background: #f5f5f5;
+    min-height: 100vh;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #daa520;
+  }
+  
+  form {
+    max-width: 500px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  label {
+    display: block;
+    margin-bottom: 15px;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  button {
+    width: 100%;
+    background: #000;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  &:hover {
+    background: #444;
+  }
+  
