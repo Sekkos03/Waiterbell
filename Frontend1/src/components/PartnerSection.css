@@ -1,0 +1,13 @@
+.partner-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem 0;
+    background: black;
+
+    img {
+      max-width: 150px;
+      filter: brightness(0) invert(1);
+    }
+  }
