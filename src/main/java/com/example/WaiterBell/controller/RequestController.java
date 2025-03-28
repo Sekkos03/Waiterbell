@@ -29,15 +29,14 @@ public class RequestController {
       repository.save(request);
 
       // Construct email content
-      String subject = "New Request Submission";
+      String subject = "Ny førespørsel";
       String body = String.format(
-          "A new request has been submitted:\n\n" +
-          "Name: %s %s\n" +
+          "En ny forespørsel:\n\n" +
+          "Navn: %s %s\n" +
           "Email: %s\n" +
-          "Phone: %s\n" +
-          "Number of Tables: %d\n" +
-          "Number of Bells: %d\n\n" +
-          "Please take appropriate action.",
+          "Telefon: %s\n" +
+          "Antall Bord: %d\n" +
+          "Antall klokker: %d\n\n",
           request.getFirstName(),
           request.getLastName(),
           request.getEmail(),
@@ -47,10 +46,8 @@ public class RequestController {
       );
 
       // Send the email notification to the organization's email
-      mailService.sendRequestNotification("your_organization_email@example.com", subject, body);
+      mailService.sendRequestNotification("Sekoukosiah82@gmail.com", subject, body);
 
       return ResponseEntity.ok("Data received and notification sent.");
     }
-
-   
 }

@@ -193,7 +193,7 @@
 
 /* Se Fordeler Seksjon */
 .benefits-section {
-  background-color: #0d1117;
+  background-color: #0d1015;
   color: white;
   padding: 80px 0;
   text-align: center;
@@ -203,7 +203,8 @@
   font-size: 2.8rem;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: -20px;
+  margin-right: -100px;
 }
 
 .benefits-logo {
@@ -281,7 +282,7 @@
 }
 /* Waiter Bell Leverer Til Seksjon */
 .waiter-bell-section {
-  background-color: #0d1117;
+  background-color: #0d1015;
   color: white;
   padding: 80px 0;
   text-align: center;
@@ -291,7 +292,21 @@
   font-size: 2.8rem;
   font-weight: bold;
   text-align: center;
+  margin-bottom: -20px;
+  margin-right: -100px;
+}
+.waiter-bell-titleTO {
+  font-size: 2.8rem;
+  font-weight: bold;
+  text-align: center;
   margin-bottom: 40px;
+}
+
+.waiter-bell-titleEN {
+  font-size: 2.8rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: -20px;
 }
 
 .waiter-bell-logo {
@@ -331,15 +346,17 @@
 }
 
 .category-item ul {
-  list-style: none;
-  padding: 0;
-  margin-top: 10px;
+  list-style-type: disc;
+  padding-left: 20px;
+  text-align: left;
+  margin-top: 15px;
 }
 
 .category-item li {
   font-size: 1.1rem;
   margin-bottom: 8px;
 }
+
 
 @media (max-width: 768px) {
   .waiter-bell-title {
@@ -357,7 +374,7 @@
 }
 /* OmOss.css */
 .about-section {
-  background: linear-gradient(90deg, rgb(0, 0, 0) 0%, rgb(26, 23, 23) 100%);
+  background-color: #0d1015;
   color: white;
   padding: 60px 0;
   text-align: center;
@@ -384,33 +401,16 @@
 .why-choose-text {
   flex: 1;
   padding: 0 20px;
+  margin-top: 50px;
 }
 
-.about-text h2,
-.why-choose-text h2 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  text-align: center;
-}
+
 
 .about-text p,
 .why-choose-text p {
   font-size: 1.1rem;
   line-height: 1.6;
   margin-bottom: 10px;
-}
-
-/* Justerer logo under Om oss uten for mye mellomrom */
-.about-logo {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0; /* Reduserer mellomrommet */
-  transform: scale(1.7); /* 50% of the original size */
-  transform-origin: center; /* Ensures it scales from the center */
-}
-
-.about-logo img {
-  width: 200px;
 }
 
 /* Responsiv design */
@@ -432,7 +432,7 @@
 
 /* Kontakt Seksjon */
 .contact-section {
-  background: linear-gradient(90deg, rgb(0, 0, 0) 0%, rgb(26, 23, 23) 100%);
+  background-color: #0d1015;
   color: white;
   padding: 80px 0;
   text-align: center;

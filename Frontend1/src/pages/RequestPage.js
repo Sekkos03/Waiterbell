@@ -13,19 +13,36 @@ import { Link } from "react-router-dom";
 import "./Navbar.css";
 import { Button } from "./Button2";
 import Logo_WB_US from "../asset/Logo_WB_US.png";
+import ReCAPTCHA from "react-google-recaptcha";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
+import Hotell from "../asset/Hotell.jpg";
+import Restaurant from "../asset/restaurant_ordering.jpg";
+import Uteliv from "../asset/Uteliv.jpg";
 
 const RequestPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const navigate = useNavigate();
-
   const scrollToSection1 = () => {
     document.getElementById("omoss").scrollIntoView({ behavior: "smooth" });
   };
   const scrollToSection2 = () => {
     document.getElementById("kontakt").scrollIntoView({ behavior: "smooth" });
+  };
+  const scrollToSection3 = () => {
+    document.getElementById("beompris").scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToSection4 = () => {
+    document
+      .getElementById("sefordeler")
+      .scrollIntoView({ behavior: "smooth" });
+  };
+  const scrollToSection5 = () => {
+    document
+      .getElementById("leverertil")
+      .scrollIntoView({ behavior: "smooth" });
   };
 
   const handleRequestPage = () => {
@@ -59,28 +76,73 @@ const RequestPage = () => {
     phone: "",
   });
 
+  const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  const [recaptchaToken, setRecaptchaToken] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: value, // no .trim()
     }));
   };
+  
 
+  // Validering av inputfelter
+  const validateForm = () => {
+    // Sørg for at ingen felt er tomme
+    for (const key in formData) {
+      if (formData[key] === "") {
+        setMessage("Alle felter må fylles ut.");
+        return false;
+      }
+    }
+
+    // Enkel e-post validering
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setMessage("Vennligst skriv inn en gyldig e-postadresse.");
+      return false;
+    }
+
+    // Blokkering av midlertidige e-postadresser
+    const disposableDomains = ["10minutemail.com", "tempmail.com", "guerrillamail.com"];
+    const emailDomain = formData.email.split("@")[1];
+    if (disposableDomains.includes(emailDomain)) {
+      setMessage("Engangseposter er ikke tillatt.");
+      return false;
+    }
+
+    // reCAPTCHA-bekreftelse
+    if (!recaptchaToken) {
+      setMessage("Vennligst bekreft at du ikke er en robot.");
+      return false;
+    }
+
+    return true;
+  };
+
+  // Håndter form-submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
     setMessage("");
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setSubmitting(true);
     try {
-      const response = await axios.post(
-        "http://localhost:8080/request",
-        formData
-      );
+      const response = await axios.post("http://localhost:8080/request", {
+        ...formData,
+        recaptchaToken,
+      });
+
       console.log("Submitted successfully", response.data);
-      setMessage("Submitted successfully!");
+
+      // Nullstill form-data etter innsending
       setFormData({
         resturantName: "",
         numTables: "",
@@ -90,9 +152,11 @@ const RequestPage = () => {
         email: "",
         phone: "",
       });
+
+      navigate("/confirmation");
     } catch (error) {
       console.error("Error submitting form", error);
-      setMessage("Failed to submit the form. Please try again.");
+      setMessage("Noe gikk galt. Prøv igjen.");
     }
     setSubmitting(false);
   };
@@ -109,6 +173,16 @@ const RequestPage = () => {
             <i className={click ? "fas fa-times" : "fas fa-bars"} />
           </div>
           <ul className={click ? "nav-menu active" : "nav-menu"}>
+          <li className="nav-item">
+              <Link className="nav-links" onClick={scrollToSection4}>
+                Se Fordeler
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-links" onClick={scrollToSection5}>
+                Leverer til
+              </Link>
+            </li>
             <li className="nav-item">
               <Link className="nav-links" onClick={scrollToSection1}>
                 Om oss
@@ -120,171 +194,174 @@ const RequestPage = () => {
               </Link>
             </li>
 
-            <li>
-              <Link
-                to="/"
-                className="nav-links-mobile"
-                onClick={closeMobileMenu}
-              >
-                Hjem
+            <li className="nav-item">
+              <Link className="nav-links" onClick={scrollToSection3}>
+                Be om pris
               </Link>
             </li>
           </ul>
-          {button && <Button buttonStyle="btn--outline">Hjem</Button>}
         </div>
       </nav>
+      <div className="parent">
+      <section className="about-section" id="beompris">
       <div className="request-page">
-        <div className="request-container">
-          {/* Venstre side - Logo */}
-          <div className="logo-container">
-            <img src={logo} alt="Waiter Bell Logo" className="logo-img" />
-          </div>
+          <div className="request-container">
+  {/* Left Side - Logo */}
+  <div className="logo-container">
+    <img src={logo} alt="Waiter Bell Logo" className="logo-img" />
+  </div>
 
-          {/* Midtdel - Skjema */}
-          <div className="form-container">
-            <h1>Be om pris</h1>
-            <form onSubmit={handleSubmit}>
-              <input
-                type="number"
-                name="numTables"
-                placeholder="Antall bord"
-                value={formData.numTables}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="number"
-                name="numBells"
-                placeholder="Antall Klokker"
-                value={formData.numBells}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="text"
-                name="firstName"
-                placeholder="Fornavn"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Etternavn"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Telefonnummer"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Epost"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="text"
-                name="resturantName"
-                placeholder="Restaurant navn"
-                value={formData.resturantName}
-                onChange={handleChange}
-                required
-              />
-              <button type="submit" disabled={submitting}>
-                <strong>Send</strong>
-              </button>
-              {message && <p className="message">{message}</p>}
-            </form>
-          </div>
+  {/* Midtdel - Skjema */}
+  <div className="form-container">
+    <div className="parent">
+              <h1>Great service starts with Waiter Bell</h1>
+              </div>
+              <h1>Be om pris</h1>
+              <form onSubmit={handleSubmit}>
+                <input type="number" name="numTables" placeholder="Antall bord" value={formData.numTables} onChange={handleChange} required />
+                <input type="number" name="numBells" placeholder="Antall Klokker" value={formData.numBells} onChange={handleChange} required />
+                <input type="text" name="firstName" placeholder="Fornavn" value={formData.firstName} onChange={handleChange} required />
+                <input type="text" name="lastName" placeholder="Etternavn" value={formData.lastName} onChange={handleChange} required />
+              
 
-          {/* Høyre side - Slagord */}
-          <div className="slogan-container">
-            <h2>Order,</h2>
-            <h2>Pay, and</h2>
-            <h2>Call with</h2>
-            <h2>One Click.</h2>
+                <input type="tel" name="phone" placeholder="Telefonnummer" value={formData.phone} onChange={handleChange} required />
+                <input type="email" name="email" placeholder="Epost" value={formData.email} onChange={handleChange} required />
+                <input type="text" name="resturantName" placeholder="Firma Navn" value={formData.resturantName} onChange={handleChange} required />
+                <div className="bot">
+                {/* reCAPTCHA-verifisering */}
+                <ReCAPTCHA
+                  sitekey="6LfxO_wqAAAAABrJMwNVEfdM60bGCNgJi6sez5EH"
+                  onChange={(token) => setRecaptchaToken(token)}
+                />
+                </div>
+
+                <button type="submit" disabled={submitting}>
+                  <strong>Send</strong>
+                </button>
+                {message && <p className="message">{message}</p>}
+              </form>
+            </div>
+
+  {/* Right Side - Slogan */}
+  <div className="slogan-container">
+    <h2>Order,</h2>
+    <h2>Pay, and</h2>
+    <h2>Call with</h2>
+    <h2>One Click.</h2>
+  </div>
+</div>
+</div>
+</section>
+{/* Se Fordeler Section */}
+        <section className="benefits-section text-center py-5" id="sefordeler">
+          <div className="container">
+            <h2 className="benefits-title">
+              Se fordeler{" "}
+              <img src={Logo_WB_US} alt="Logo" className="benefits-logo" />
+            </h2>
+            <div className="row mt-5">
+              <div className="col-md-4 benefit-item">
+                <h3>Gjester</h3>
+                <div className="circle-progress">80%</div>
+                <h4>Mindre ventetid</h4>
+                <p>Waiter Bell tjenesten reduserer ventetiden for gjestene.</p>
+              </div>
+              <div className="col-md-4 benefit-item">
+                <h3>Tips</h3>
+                <div className="circle-progress">40%</div>
+                <h4>Mer tips</h4>
+                <p>Raskere service bidrar til økt kundetilfredshet.</p>
+              </div>
+              <div className="col-md-4 benefit-item">
+                <h3>Restaurant eiere</h3>
+                <div className="circle-progress">19%</div>
+                <h4>Øker inntektene</h4>
+                <p>
+                  Waiter Bell tjenesten gjør det enkelt for gjestene å bestille.
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
+        {/* Waiter Bell Leverer Til Section */}
+        <section
+          className="waiter-bell-section text-center py-5"
+          id="leverertil"
+        >
+          <div className="container">
+            <h2 className="waiter-bell-title">
+              Waiter Bell leverer til{" "}
+              <img src={Logo_WB_US} alt="Logo" className="waiter-bell-logo" />
+            </h2>
+            <div className="row mt-5">
+              <div className="col-md-4 category-item">
+                <img
+                  src={Restaurant}
+                  alt="Restaurant"
+                  className="category-image"
+                />
+                <h3>Restaurant</h3>
+                <ul>
+                  <li>Unngå lang ventetid for gjester å bestille</li>
+                  <li>Bestill og betalt enkelt</li>
+                  <li>Gjør det enklere for servitørene</li>
+                </ul>
+              </div>
+              <div className="col-md-4 category-item">
+                <img src={Uteliv} alt="Uteliv" className="category-image" />
+                <h3>Uteliv</h3>
+                <ul>
+                  <li>Øker sjansen for flere bestillinger</li>
+                  <li>Slippe bar-kø</li>
+                  <li>Gir gjestene VIP opplevelse</li>
+                </ul>
+              </div>
+              <div className="col-md-4 category-item">
+                <img src={Hotell} alt="Hotell" className="category-image" />
+                <h3>Hotell</h3>
+                <ul>
+                  <li>Øker arbeidskapasiteten</li>
+                  <li>Bedre oversikt på bestillinger og betalinger</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+       </div>
       <section className="about-section" id="omoss">
         <div className="container">
           {/* Venstre side - Om oss */}
           <div className="about-text">
-            <h2>Om oss</h2>
+            <h2 className="waiter-bell-titleTO">Om oss</h2>
             <p>
-              Waiter Bell er et norsk selskap som tilbyr fleksibel kommunikasjon
+            <strong>Waiter Bell</strong> er et norsk selskap som tilbyr fleksibel kommunikasjon
               mellom gjester og servitør.
             </p>
             <p>
               <strong>Mål:</strong> Å gi restauranter, barer og hoteller
-              muligheten til å forbedre
+              muligheten til å forbedre kundeopplevelsen, øke effektiviteten, og gi gjestene en VIP-opplevelse.
             </p>
-            <p>Serviceopplevelsen er det som får kunden til å komme tilbake.</p>
-
-            {/* Plassering av logo under teksten */}
-            <div className="about-logo">
-              <img src={Logo_medT} alt="Waiter Bell Logo" />
-            </div>
-          </div>
-
-          {/* Høyre side - Hvorfor velge oss */}
-          <div className="why-choose-text">
-            <h2>Hvorfor velge oss?</h2>
-            <p>
-              <strong>Reduser ventetid:</strong> Unngå at gjester venter for
-              lenge med å få oppmerksomhet.
-            </p>
-            <p>
-              <strong>Enkelt og effektivt:</strong> Bestilling og betaling med
-              ett klikk.
-            </p>
-            <p>
-              <strong>Bedre oversikt:</strong> Servitører har full oversikt over
-              alle forespørsler.
-            </p>
-            <p>
-              <strong>Økt kapasitet:</strong> Gjør det enklere for servitører å
-              betjene flere gjester.
-            </p>
-            <p>
-              <strong>VIP-opplevelse:</strong> Gjestene føler seg ivaretatt uten
-              å måtte vente.
-            </p>
+            <p><strong>Serviceopplevelsen</strong> er det som får kunden til å komme tilbake!</p>
           </div>
         </div>
       </section>
       {/* Kontakt Section */}
       <section className="contact-section text-center py-5" id="kontakt">
         <div className="container">
-          <h2 className="contact-title">Kontakt</h2>
+          <h2 className="waiter-bell-titleEN">Kontakt</h2>
           <div className="row mt-5">
-            <div className="col-md-4 contact-item">
+            <div className="col-md-6 contact-item">
               <h3>Stephan Kovac</h3>
               <p>Daglig leder</p>
               <p>Tlf: +47 455 10 294</p>
-              <p>E-post: stephan@waiterbell.no</p>
+              <p className="email-line">E-post: stephan@waiterbell.no</p>
+
             </div>
-            <div className="col-md-4 contact-item">
+            <div className="col-md-6 contact-item">
               <h3>Josef Missoum</h3>
-              <p>Salgsjef</p>
+              <p>Salgssjef</p>
               <p>Tlf: +47 929 70 458</p>
               <p>E-post: josef@waiterbell.no</p>
-            </div>
-            <div className="col-md-4 contact-item">
-              <h3>Alexander Eliassen</h3>
-              <p>Økonomisjef</p>
-              <p>Tlf: +47 403 40 825</p>
-              <p>E-post: alexander@waiterbell.no</p>
             </div>
           </div>
           <div className="contact-logo mt-5">
